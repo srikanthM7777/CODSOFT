@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Calculator | CodSoft Internship</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;600&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #0f0f13;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', sans-serif;
+      background-image: radial-gradient(ellipse at 20% 50%, #1a1a2e 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 20%, #16213e 0%, transparent 50%);
+    }
+
+    .label {
+      color: #3d5aff;
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      font-weight: 600;
+    }
+
+    .calculator {
+      background: #18181f;
+      border-radius: 24px;
+      padding: 24px;
+      width: 320px;
+      box-shadow:
+        0 0 0 1px #2a2a38,
+        0 24px 64px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+
+    .display {
+      background: #0d0d12;
+      border-radius: 14px;
+      padding: 16px 20px 14px;
+      margin-bottom: 20px;
+      min-height: 88px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: flex-end;
+      border: 1px solid #222230;
+    }
+
+    .display .expression {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.8rem;
+      color: #4a4a6a;
+      min-height: 18px;
+      margin-bottom: 6px;
+      word-break: break-all;
+      text-align: right;
+    }
+
+    .display .result {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 2.2rem;
+      color: #e8e8f0;
+      line-height: 1;
+      word-break: break-all;
+      text-align: right;
+      transition: color 0.15s;
+    }
+
+    .display .result.flash { color: #3d5aff; }
+
+    
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    button {
+      height: 58px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-family: 'Share Tech Mono', monospace;
+      cursor: pointer;
+      transition: transform 0.08s, background 0.1s, box-shadow 0.1s;
+      outline: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button:active { transform: scale(0.93); }
+
+    
+    .btn-num {
+      background: #23232e;
+      color: #d0d0e8;
+      box-shadow: 0 2px 0 #111118;
+    }
+    .btn-num:hover { background: #2c2c3a; }
+
+    
+    .btn-op {
+      background: #1e2240;
+      color: #7b8fff;
+      box-shadow: 0 2px 0 #111118;
+    }
+    .btn-op:hover { background: #272d55; }
+
+    
+    .btn-eq {
+      background: #3d5aff;
+      color: #fff;
+      box-shadow: 0 2px 0 #1a2ecc;
+    }
+    .btn-eq:hover { background: #5571ff; }
+
+    
+    .btn-clear {
+      background: #2e1e2e;
+      color: #ff6b8a;
+      box-shadow: 0 2px 0 #111118;
+    }
+    .btn-clear:hover { background: #3d2535; }
+
+    .btn-zero { grid-column: span 2; }
+
+    
+    button::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.06);
+      opacity: 0;
+      transition: opacity 0.15s;
+      border-radius: inherit;
+    }
+    button:active::after { opacity: 1; }
+
+    .footer-note {
+      margin-top: 22px;
+      font-size: 0.65rem;
+      color: #2a2a40;
+      letter-spacing: 0.1em;
+    }
+  </style>
+</head>
+<body>
+
+  <p class="label">CodSoft &mdash; Web Dev Internship</p>
+
+  <div class="calculator">
+    <div class="display">
+      <div class="expression" id="expression"></div>
+      <div class="result" id="result">0</div>
+    </div>
+
+    <div class="buttons">
+      <!-- Row 1 -->
+      <button class="btn-clear" onclick="clearAll()">AC</button>
+      <button class="btn-clear" onclick="toggleSign()">+/−</button>
+      <button class="btn-clear" onclick="percent()">%</button>
+      <button class="btn-op"    onclick="inputOp('/')">÷</button>
+
+      <!-- Row 2 -->
+      <button class="btn-num" onclick="inputNum('7')">7</button>
+      <button class="btn-num" onclick="inputNum('8')">8</button>
+      <button class="btn-num" onclick="inputNum('9')">9</button>
+      <button class="btn-op"  onclick="inputOp('*')">×</button>
+
+      <!-- Row 3 -->
+      <button class="btn-num" onclick="inputNum('4')">4</button>
+      <button class="btn-num" onclick="inputNum('5')">5</button>
+      <button class="btn-num" onclick="inputNum('6')">6</button>
+      <button class="btn-op"  onclick="inputOp('-')">−</button>
+
+      <!-- Row 4 -->
+      <button class="btn-num" onclick="inputNum('1')">1</button>
+      <button class="btn-num" onclick="inputNum('2')">2</button>
+      <button class="btn-num" onclick="inputNum('3')">3</button>
+      <button class="btn-op"  onclick="inputOp('+')">+</button>
+
+      <!-- Row 5 -->
+      <button class="btn-num btn-zero" onclick="inputNum('0')">0</button>
+      <button class="btn-num" onclick="inputDot()">.</button>
+      <button class="btn-eq"  onclick="calculate()">=</button>
+    </div>
+  </div>
+
+  <p class="footer-note">HTML &bull; CSS &bull; JavaScript</p>
+
+  <script>
+    let current = '0';
+    let previous = '';
+    let operator = null;
+    let freshResult = false;
+
+    const resultEl   = document.getElementById('result');
+    const expressionEl = document.getElementById('expression');
+
+    function updateDisplay() {
+      resultEl.textContent = current.length > 12
+        ? parseFloat(current).toExponential(4)
+        : current;
+    }
+
+    function flash() {
+      resultEl.classList.add('flash');
+      setTimeout(() => resultEl.classList.remove('flash'), 200);
+    }
+
+    function inputNum(n) {
+      if (freshResult) { current = n; freshResult = false; }
+      else current = current === '0' ? n : current + n;
+      updateDisplay();
+    }
+
+    function inputDot() {
+      if (freshResult) { current = '0.'; freshResult = false; updateDisplay(); return; }
+      if (!current.includes('.')) { current += '.'; updateDisplay(); }
+    }
+
+    function inputOp(op) {
+      if (operator && !freshResult) calculate(true);
+      previous = current;
+      operator = op;
+      freshResult = true;
+      const sym = { '+': '+', '-': '−', '*': '×', '/': '÷' }[op];
+      expressionEl.textContent = previous + ' ' + sym;
+    }
+
+    function calculate(chain = false) {
+      if (!operator || previous === '') return;
+      const a = parseFloat(previous);
+      const b = parseFloat(current);
+      let res;
+      if (operator === '+') res = a + b;
+      else if (operator === '-') res = a - b;
+      else if (operator === '*') res = a * b;
+      else if (operator === '/') res = b === 0 ? 'Error' : a / b;
+
+      const sym = { '+': '+', '-': '−', '*': '×', '/': '÷' }[operator];
+      if (!chain) expressionEl.textContent = previous + ' ' + sym + ' ' + current + ' =';
+
+      current = res === 'Error' ? 'Error' : String(parseFloat(res.toFixed(10)));
+      operator = null;
+      previous = '';
+      freshResult = true;
+      flash();
+      updateDisplay();
+    }
+
+    function clearAll() {
+      current = '0'; previous = ''; operator = null; freshResult = false;
+      expressionEl.textContent = '';
+      updateDisplay();
+    }
+
+    function toggleSign() {
+      if (current !== '0' && current !== 'Error')
+        current = String(parseFloat(current) * -1);
+      updateDisplay();
+    }
+
+    function percent() {
+      if (current !== 'Error')
+        current = String(parseFloat(current) / 100);
+      updateDisplay();
+    }
+
+    
+    document.addEventListener('keydown', e => {
+      if (e.key >= '0' && e.key <= '9') inputNum(e.key);
+      else if (e.key === '.') inputDot();
+      else if (e.key === '+') inputOp('+');
+      else if (e.key === '-') inputOp('-');
+      else if (e.key === '*') inputOp('*');
+      else if (e.key === '/') { e.preventDefault(); inputOp('/'); }
+      else if (e.key === 'Enter' || e.key === '=') calculate();
+      else if (e.key === 'Escape') clearAll();
+      else if (e.key === 'Backspace') {
+        if (current.length > 1) current = current.slice(0, -1);
+        else current = '0';
+        updateDisplay();
+      }
+    });
+  </script>
+</body>
+</html>
